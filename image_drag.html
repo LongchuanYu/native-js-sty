@@ -1,0 +1,79 @@
+<head>
+  <meta charset="UTF-8">
+  <style>
+    .scontainer {
+        position: relative;
+        width: 800px;
+        height:600px;
+        padding: 20px;
+        border: 1px solid grey;
+    }
+    .simg {
+        position: absolute;
+        width: 700px;
+        height:500px;
+    }
+  </style>
+</head>
+
+<body>
+<pre>
+  实现图片拖拽的效果
+  1. 放大缩小
+  2. 拖拽
+</pre>
+
+
+<div class="scontainer" id="container">
+  <img
+    draggable="true"
+    src="./assets/1.jpg"
+    class="simg"
+    id="img"
+  />
+
+</div>
+
+<script>
+    var g = 1.1
+    var drag = false
+    var imgdiv = document.getElementById('img')
+    function onZoom(delta) {
+        let ef = document.getElementById('img');
+        if (delta>0) {g+=0.1}
+        else {g-=0.1}
+
+        ef.style.transform = `scale(${g})`
+
+    }
+    document.getElementById('container').onmousewheel = e => {
+        let delta = e.wheelDelta;
+        onZoom(delta)
+        return e.preventDefault()
+    }
+
+    imgdiv.onmousedown = function(ev) {
+        var event = ev||window.event;
+        var diffX = event.clientX - imgdiv.offsetLeft;
+        var diffY = event.clientY - imgdiv.offsetTop;
+        drag = true
+        imgdiv.onmousemove = function(e) {
+            if (!drag) return
+            e.preventDefault()
+            var moveX = e.clientX - diffX;
+            var moveY = e.clientY - diffY;
+            imgdiv.style.left = moveX + 'px';
+            imgdiv.style.top = moveY + 'px';
+        }
+    }
+    document.onmouseup = function(e) {
+        console.log('up...')
+        this.onmousemove = null
+        drag = false
+    }
+
+
+
+
+</script>
+</body>

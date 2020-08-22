@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+
+    <script src="socket.io-client/dist/socket.io.js"></script>
+    <script>
+        // const socket = io('http://localhost:7007',{
+        //     transports: ['websocket']
+        // })
+        // socket.on('crop_and_send_image',res=>{
+        //     // document.getElementById('pic').src = "data:image/png;base64,"+res.image;
+        //     let node = `<img src="data:image/jpg;base64,${res.image}"/>`
+        //     let htmlnode = document.createElement('div')
+        //     htmlnode.innerHTML = node
+        //     document.getElementById("pic").appendChild(htmlnode)
+        // })
+    </script>
+</head>
+
+<body>
+    <pre>
+        [socket.io]
+        1. 页面载入前开始加载socket监听
+        2. 收到socket返回的结果后拼接到DOM树中
+    </pre>
+    <button onclick="test()">click me</button>
+    <div id="pic">
+    </div>
+
+    <script>
+        function js_dom() {
+            let p = document.getElementById('pic')
+            if(p && p.parentNode) {
+                p.parentNode.removeChild(p)
+            }
+            let newNode = document.createElement("div")
+            newNode.setAttribute("id","pic")
+            document.body.insertBefore(newNode, document.body.getElementsByTagName("script")[0])
+            $.ajax({
+                url:'http://localhost:7007/annotation-get-registered-object',
+                type:'GET',
+                success:function (res) {
+                    console.log(res)
+                }
+            })
+        }
+    </script>
+</body>
