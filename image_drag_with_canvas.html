@@ -10,8 +10,6 @@
     }
     .simg {
         position: absolute;
-        width: 700px;
-        height:500px;
     }
   </style>
 </head>
@@ -26,12 +24,12 @@
 <button onclick="console.log(lineArray)">info</button>
 
 <div class="scontainer" id="container">
-  <img
-    draggable="true"
-    src="./assets/1.jpg"
+  <canvas
+    width="700"
+    height="600"
     class="simg"
     id="img"
-  >
+  ></canvas>
 
 </div>
 
@@ -45,41 +43,56 @@
     var moveX
     var moveY
     var imgdiv = document.getElementById('img')
+    var ctx = imgdiv.getContext('2d')
 
-    function onZoom(delta) {
-        let ef = document.getElementById('img');
-        if (delta>0) {g+=0.1}
-        else {g-=0.1}
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = this.lineWidth;
 
-        ef.style.transform = `scale(${g})`
+    window.onload = function(e) {
+        let img = new Image()
+        img.src = './assets/1.jpg'
+        img.onload = function() {
+            ctx.drawImage(img,0,0,imgdiv.width,imgdiv.height)
+        }
 
     }
 
     document.getElementById('container').onmousewheel = e => {
         let delta = e.wheelDelta;
-        onZoom(delta)
+        let ef = document.getElementById('img');
+        if (delta>0) {g+=0.1}
+        else {g-=0.1}
+        ef.style.transform = `scale(${g})`
         return e.preventDefault()
     }
 
     imgdiv.onmousedown = function(ev) {
         const event = ev||window.event;
-        console.log(ev)
+
         diffX = event.clientX - imgdiv.offsetLeft;
         diffY = event.clientY - imgdiv.offsetTop;
+        console.log(diffX_,diffY_)
         mark = true
 
+        let edge = new Path2D()
+        edge.moveTo(diffX, diffY)
+        lineArray.push([diffX, diffY])
         if (event.shiftKey) {
             drag = true
         }
         ev.preventDefault()
     }
     imgdiv.onmousemove = function(e) {
-        if (!drag) return
+        if (drag) {
+            moveX = e.clientX - diffX;
+            moveY = e.clientY - diffY;
+            imgdiv.style.left = moveX + 'px';
+            imgdiv.style.top = moveY + 'px';
+        }else{
 
-        moveX = e.clientX - diffX;
-        moveY = e.clientY - diffY;
-        imgdiv.style.left = moveX + 'px';
-        imgdiv.style.top = moveY + 'px';
+        }
+
         e.preventDefault()
     }
     document.onmouseup = function(e) {
