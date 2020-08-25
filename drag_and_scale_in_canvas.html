@@ -1,0 +1,103 @@
+<head>
+  <meta charset="UTF-8">
+  <style>
+      .scontainer {
+          position: relative;
+          width: 800px;
+          height:600px;
+
+          border: 1px solid grey;
+      }
+      .simg {
+          position: absolute;
+      }
+  </style>
+</head>
+
+<body>
+<pre>
+  实现图片拖拽的效果
+  1. 放大缩小
+  2. shift键拖拽
+</pre>
+
+<div class="scontainer" id="container">
+  <canvas
+    width="700"
+    height="600"
+    class="simg"
+    id="img"
+  ></canvas>
+
+</div>
+
+<script>
+    var g = 1.1
+    var drag = false
+    var diffX
+    var diffY
+    var moveX
+    var moveY
+
+    var imgdiv = document.getElementById('img')
+    var ctx = imgdiv.getContext('2d')
+
+
+
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = this.lineWidth;
+
+    window.onload = function(e) {
+        let img = new Image()
+        img.src = './assets/1.jpg'
+        img.onload = function() {
+            ctx.drawImage(img,0,0,imgdiv.width,imgdiv.height)
+        }
+
+    }
+
+    document.getElementById('container').onmousewheel = e => {
+        let delta = e.wheelDelta;
+        let ef = document.getElementById('img');
+        // 最好写成指数的形式,不然放太大了,效果不明显
+        if (delta>0) {g+=0.1}
+        else {g-=0.1}
+        ef.style.transform = `scale(${g})`
+        return e.preventDefault()
+    }
+
+    imgdiv.onmousedown = function(ev) {
+
+        ev.preventDefault()
+        const event = ev||window.event;
+        diffX = event.clientX - imgdiv.offsetLeft;
+        diffY = event.clientY - imgdiv.offsetTop;
+
+        if (event.shiftKey) {
+            drag = true
+            return
+        }
+
+
+    }
+    imgdiv.onmousemove = function(e) {
+
+        if (drag) {
+            moveX = e.clientX - diffX;
+            moveY = e.clientY - diffY;
+            imgdiv.style.left = moveX + 'px';
+            imgdiv.style.top = moveY + 'px';
+        }
+        e.preventDefault()
+    }
+    document.onmouseup = function(e) {
+        // imgdiv.onmousemove = null
+        drag = false
+    }
+
+
+
+
+</script>
+</body>

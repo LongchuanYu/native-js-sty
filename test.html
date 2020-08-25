@@ -1,16 +1,16 @@
 <head>
   <meta charset="UTF-8">
   <style>
-    .scontainer {
-        position: relative;
-        width: 800px;
-        height:600px;
-        padding: 20px;
-        border: 1px solid grey;
-    }
-    .simg {
-        position: absolute;
-    }
+      .scontainer {
+          position: relative;
+          width: 800px;
+          height:600px;
+
+          border: 1px solid grey;
+      }
+      .simg {
+          position: absolute;
+      }
   </style>
 </head>
 
@@ -21,7 +21,6 @@
   2. shift键拖拽
   3. 画线
 </pre>
-<button onclick="console.log(lineArray)">info</button>
 
 <div class="scontainer" id="container">
   <canvas
@@ -36,14 +35,15 @@
 <script>
     var g = 1.1
     var drag = false
-    var lineArray = []
-    var mark = false
     var diffX
     var diffY
     var moveX
     var moveY
+
     var imgdiv = document.getElementById('img')
     var ctx = imgdiv.getContext('2d')
+
+
 
     ctx.lineCap = 'round';
     ctx.strokeStyle = 'red';
@@ -68,35 +68,31 @@
     }
 
     imgdiv.onmousedown = function(ev) {
-        const event = ev||window.event;
 
+        ev.preventDefault()
+        const event = ev||window.event;
         diffX = event.clientX - imgdiv.offsetLeft;
         diffY = event.clientY - imgdiv.offsetTop;
-        console.log(diffX_,diffY_)
-        mark = true
 
-        let edge = new Path2D()
-        edge.moveTo(diffX, diffY)
-        lineArray.push([diffX, diffY])
         if (event.shiftKey) {
             drag = true
+            return
         }
-        ev.preventDefault()
+
+
     }
     imgdiv.onmousemove = function(e) {
+
         if (drag) {
             moveX = e.clientX - diffX;
             moveY = e.clientY - diffY;
             imgdiv.style.left = moveX + 'px';
             imgdiv.style.top = moveY + 'px';
-        }else{
-
         }
-
         e.preventDefault()
     }
     document.onmouseup = function(e) {
-        this.onmousemove = null
+        // imgdiv.onmousemove = null
         drag = false
     }
 
