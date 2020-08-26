@@ -65,6 +65,10 @@
             if(e.button===0){
                 lastCkX = e.offsetX
                 lastCkY = e.offsetY
+                if (pointList.length){
+                    draw_line_common(e, 'EdgePush')
+                }
+
                 pointList.push([lastCkX,lastCkY])
 
             }
@@ -107,22 +111,27 @@
         //     drawCtx.stroke(paths)
         // }
     }
-    function draw_line_common(e,start=null,end=null,type='EdgeDraw') {
+    function draw_line_common(e,type='EdgeDraw',start=null,end=null) {
         /**
          * type include 'EdgePush': push edge to edgeList
-         * type=''
+         * type include 'EdgeDraw': ctx.stroke(`)
         **/
         if (!start) {
            start = pointList[pointList.length-1]
         }
         if (!end) {
-            end = e
+            end = [e.offsetX,e.offsetY]
         }
+        console.log(type)
         const edge = new Path2D()
         edge.moveTo(start[0],start[1])
         edge.lineTo(end[0],end[1])
-        if (type.indexOf('EdgePush') !== -1) edgeList.push(edge)
+        if (type.indexOf('EdgePush') !== -1) {
+            console.log('edge push')
+            edgeList.push(edge)
+        }
         if (type.indexOf('EdgeDraw') !== -1) {
+            console.log('draw')
             drawCtx.beginPath()
             drawCtx.stroke(edge)
         }
