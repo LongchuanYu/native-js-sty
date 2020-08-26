@@ -20,8 +20,9 @@
 <body>
 <pre>
   1. 画线
+  2. 优化代码结构
 </pre>
-<!--<button onclick="console.log(lineArray)">info</button>-->
+<button onclick="console.log(edgeList)">info</button>
 <div id="container">
   <canvas id="imageCanvas"
           width="700"
@@ -32,50 +33,49 @@
 </div>
 
 <script>
+    var imgData = new Image()
+    var lastCkX = 0
+    var lastCkY = 0
+    var pointList = []
+    var edgeList = []
+    var pointListCollection = []
+    var doneAnnotating = false
     var img = document.getElementById("imageCanvas");
     var draw = document.getElementById("drawingCanvas")
     var imgCtx = img.getContext('2d')
-    var drawCtx = img.getContext('2d')
-    var imgData = new Image()
-
-    var lastCkX = 0
-    var lastCkY = 0
-
-    var drawList = []
-
+    var drawCtx = draw.getContext('2d')
     window.onload = function(e) {
+        init()
+    }
+    function init() {
         drawCtx.lineCap='round';
         drawCtx.strokeStyle = 'red'
         drawCtx.lineWidth = 1.6
         imgData.src = 'assets/1.jpg'
         imgData.onload = function() {
             imgCtx.drawImage(imgData,0,0,img.width,img.height)
+            onListening()
         }
         draw.oncontextmenu = function(e) {
             e.preventDefault()
         }
-
     }
+    function onListening() {
+        draw.onmousedown = function(e) {
+            if(e.button===0){
+                lastCkX = e.offsetX
+                lastCkY = e.offsetY
+                pointList.push([lastCkX,lastCkY])
 
-    draw.onmousedown = function(e) {
+            }
 
-        lastCkX = e.offsetX
-        lastCkY = e.offsetY
-        // redrawEdge()
-        drawList.push([lastCkX,lastCkY])
-
-    }
-
-    draw.onmousemove = function(e) {
-        if (!drawList.length) return
-        let edge = new Path2D()
-        drawCtx.clearRect(0, 0, img.width, img.height)
-        redrawImg()
-        redrawEdge()
-        let [x,y] = drawList[drawList.length-1]
-        edge.moveTo(x,y)
-        edge.lineTo(e.offsetX,e.offsetY)
-        drawCtx.stroke(edge)
+        }
+        draw.onmousemove = function(e) {
+            if (!pointList.length) return
+            redrawEdge()
+            draw_line_common(e)
+            return e.preventDefault()
+        }
     }
 
     function redrawImg() {
@@ -83,22 +83,51 @@
         imgCtx.drawImage(imgData, 0, 0, img.width, img.height)
     }
     function redrawEdge() {
-        let paths = new Path2D()
-        let edge = new Path2D()
-        if (drawList.length) {
-            // 不是第一次点击划线
-            for(let i=0;i<drawList.length-1; i++) {
-                let c = drawList[i]
-                let n = drawList[i+1]
-                edge.moveTo(c[0],c[1])
-                edge.lineTo(n[0],n[1])
-                paths.addPath(edge)
+        drawCtx.clearRect(0, 0, draw.width, draw.height)
+        const allEdges = new Path2D()
+        edgeList.forEach(item => {
+            allEdges.addPath(item)
+        })
+        drawCtx.beginPath()
+        drawCtx.stroke(allEdges)
 
-            };
-            drawCtx.stroke(paths)
-        }
+        // let paths = new Path2D()
+        // let edge = new Path2D()
+        // if (pointList.length) {
+        //     // 不是第一次点击划线
+        //     for(let i=0; i<pointList.length-1; i++) {
+        //         let c = pointList[i]
+        //         let n = pointList[i+1]
+        //         edge.moveTo(c[0],c[1])
+        //         edge.lineTo(n[0],n[1])
+        //         paths.addPath(edge)
+        //
+        //     };
+        //     drawCtx.beginPath()
+        //     drawCtx.stroke(paths)
+        // }
     }
+    function draw_line_common(e,start=null,end=null,type='EdgeDraw') {
+        /**
+         * type include 'EdgePush': push edge to edgeList
+         * type=''
+        **/
+        if (!start) {
+           start = pointList[pointList.length-1]
+        }
+        if (!end) {
+            end = e
+        }
+        const edge = new Path2D()
+        edge.moveTo(start[0],start[1])
+        edge.lineTo(end[0],end[1])
+        if (type.indexOf('EdgePush') !== -1) edgeList.push(edge)
+        if (type.indexOf('EdgeDraw') !== -1) {
+            drawCtx.beginPath()
+            drawCtx.stroke(edge)
+        }
+        return edge
 
-
+    }
 </script>
 </body>
