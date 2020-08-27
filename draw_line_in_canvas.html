@@ -22,7 +22,7 @@
   1. 画线
   2. 优化代码结构
 </pre>
-<button onclick="console.log(edgeList)">info</button>
+<button onclick="console.log(pointListCollection)">info</button>
 <div id="container">
   <canvas id="imageCanvas"
           width="700"
@@ -66,18 +66,28 @@
                 lastCkX = e.offsetX
                 lastCkY = e.offsetY
                 if (pointList.length){
-                    draw_line_common(e, 'EdgePush')
+                    edgeList.push(draw_line(e))
                 }
-
+                doneAnnotating = false
                 pointList.push([lastCkX,lastCkY])
 
+            }else if (e.button === 2) {
+                doneAnnotating = true
+                let point_begin = pointList[0]
+                let edge = draw_line(e,null,point_begin)
+                edgeList.push(edge)
+                drawCtx.stroke(edge)
+                pointListCollection.push(pointList)
+                redrawEdge()
+                pointList = []
             }
 
         }
         draw.onmousemove = function(e) {
-            if (!pointList.length) return
+            if (!pointList.length || doneAnnotating) return
+
             redrawEdge()
-            draw_line_common(e)
+            drawCtx.stroke(draw_line(e))
             return e.preventDefault()
         }
     }
@@ -87,6 +97,9 @@
         imgCtx.drawImage(imgData, 0, 0, img.width, img.height)
     }
     function redrawEdge() {
+        /*
+          只和edgeList有关系，重画所有的边。
+        */
         drawCtx.clearRect(0, 0, draw.width, draw.height)
         const allEdges = new Path2D()
         edgeList.forEach(item => {
@@ -94,47 +107,20 @@
         })
         drawCtx.beginPath()
         drawCtx.stroke(allEdges)
-
-        // let paths = new Path2D()
-        // let edge = new Path2D()
-        // if (pointList.length) {
-        //     // 不是第一次点击划线
-        //     for(let i=0; i<pointList.length-1; i++) {
-        //         let c = pointList[i]
-        //         let n = pointList[i+1]
-        //         edge.moveTo(c[0],c[1])
-        //         edge.lineTo(n[0],n[1])
-        //         paths.addPath(edge)
-        //
-        //     };
-        //     drawCtx.beginPath()
-        //     drawCtx.stroke(paths)
-        // }
     }
-    function draw_line_common(e,type='EdgeDraw',start=null,end=null) {
-        /**
-         * type include 'EdgePush': push edge to edgeList
-         * type include 'EdgeDraw': ctx.stroke(`)
-        **/
+    function draw_line(e,start=null,end=null) {
+        /*default draw line from last point to active point
+        @param
+        */
         if (!start) {
            start = pointList[pointList.length-1]
         }
         if (!end) {
             end = [e.offsetX,e.offsetY]
         }
-        console.log(type)
         const edge = new Path2D()
         edge.moveTo(start[0],start[1])
         edge.lineTo(end[0],end[1])
-        if (type.indexOf('EdgePush') !== -1) {
-            console.log('edge push')
-            edgeList.push(edge)
-        }
-        if (type.indexOf('EdgeDraw') !== -1) {
-            console.log('draw')
-            drawCtx.beginPath()
-            drawCtx.stroke(edge)
-        }
         return edge
 
     }
