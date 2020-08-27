@@ -33,9 +33,10 @@
 </div>
 
 <script>
-  function dosome(a,b=2,c) {
-    console.log(a,b,c)
-  }
-  dosome(1,c=2)
+  s = [1,1,1,1,1,1]
+  s = s.map(item => {
+      return item+1
+  })
+  console.log(s)
 </script>
 </body>

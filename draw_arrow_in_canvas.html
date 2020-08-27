@@ -1,0 +1,80 @@
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #container {
+        position: relative;
+    }
+    #container canvas {
+        position: absolute;
+    }
+    #container #imageCanvas {
+        z-index: 0;
+        border: 1px dashed lightgray;
+    }
+    #container #drawingCanvas {
+        z-index: 1;
+    }
+  </style>
+</head>
+
+<body>
+<pre>
+  1. 画箭头
+</pre>
+<button onclick="console.log(pointListCollection)">info</button>
+<div id="container">
+  <canvas id="imageCanvas"
+          width="700"
+          height="600"></canvas>
+  <canvas id="drawingCanvas"
+          width="700"
+          height="600"></canvas>
+</div>
+
+<script>
+    var imgData = new Image()
+    var lastCkX = 0
+    var lastCkY = 0
+    var pointList = []
+    var arrowList = []
+    var img = document.getElementById("imageCanvas");
+    var draw = document.getElementById("drawingCanvas")
+    var imgCtx = img.getContext('2d')
+    var drawCtx = draw.getContext('2d')
+    window.onload = function(e) {
+        init()
+    }
+    function init() {
+        drawCtx.lineCap='round';
+        drawCtx.strokeStyle = 'red'
+        drawCtx.lineWidth = 1.6
+        imgData.src = 'assets/1.jpg'
+        imgData.onload = function() {
+            imgCtx.drawImage(imgData,0,0,img.width,img.height)
+            onListening()
+        }
+        draw.oncontextmenu = function(e) {
+            e.preventDefault()
+        }
+    }
+    function onListening() {
+        draw.onmousedown = function(e) {
+
+            return e.preventDefault()
+        }
+        draw.onmousemove = function(e) {
+
+            return e.preventDefault()
+        }
+    }
+
+    function redrawArrow(e) {
+        let [x,y] = pointList[pointList.length-1]
+        const arrow = new Path2D()
+        arrow.moveTo(x,y)
+        arrow.lineTo(e.offsetX,e.offsetY)
+        arrow.lineTo()
+    }
+
+</script>
+</body>
